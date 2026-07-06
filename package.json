@@ -1,0 +1,49 @@
+{
+  "name": "ehs-app",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "eslint",
+    "db:generate": "drizzle-kit generate",
+    "db:push": "drizzle-kit push",
+    "db:studio": "drizzle-kit studio",
+    "db:seed": "tsx lib/db/seed.ts",
+    "db:sqlite:push": "drizzle-kit push --config=drizzle.sqlite.config.ts",
+    "db:sqlite:seed": "cross-env DB_DRIVER=sqlite tsx lib/db/seed.ts",
+    "dev:sqlite": "cross-env DB_DRIVER=sqlite next dev"
+  },
+  "dependencies": {
+    "bcryptjs": "^3.0.3",
+    "better-sqlite3": "^12.11.1",
+    "chart.js": "^4.5.1",
+    "drizzle-orm": "^0.45.2",
+    "iron-session": "^8.0.4",
+    "mysql2": "^3.22.5",
+    "next": "16.2.10",
+    "qrcode": "^1.5.4",
+    "react": "19.2.4",
+    "react-chartjs-2": "^5.3.1",
+    "react-dom": "19.2.4",
+    "xlsx": "^0.18.5",
+    "zod": "^4.4.3"
+  },
+  "devDependencies": {
+    "@tailwindcss/postcss": "^4",
+    "@types/better-sqlite3": "^7.6.13",
+    "@types/node": "^20",
+    "@types/qrcode": "^1.5.6",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "cross-env": "^10.1.0",
+    "dotenv": "^17.4.2",
+    "drizzle-kit": "^0.31.10",
+    "eslint": "^9",
+    "eslint-config-next": "16.2.10",
+    "tailwindcss": "^4",
+    "tsx": "^4.23.0",
+    "typescript": "^5"
+  }
+}
