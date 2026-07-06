@@ -3,7 +3,6 @@ import { desc, eq } from "drizzle-orm";
 import { db, schema } from "@/lib/db/client";
 import { requireRole, handleAuthError } from "@/lib/auth/guards";
 import { memberInputSchema } from "@/lib/validation/member";
-import { extractInsertId } from "@/lib/db/insert-id";
 
 const { thanhVien } = schema;
 
@@ -54,15 +53,18 @@ export async function POST(req: NextRequest) {
     }
   }
 
-  const result = await db.insert(thanhVien).values({
-    maNv: data.maNv || `NV-${Date.now()}`,
-    hoTen: data.hoTen,
-    boPhan: data.boPhan || null,
-    xuong: data.xuong || null,
-    chucVu: data.chucVu || null,
-    email: data.email || null,
-    vaiTro: data.vaiTro,
-  });
+  const [inserted] = await db
+    .insert(thanhVien)
+    .values({
+      maNv: data.maNv || `NV-${Date.now()}`,
+      hoTen: data.hoTen,
+      boPhan: data.boPhan || null,
+      xuong: data.xuong || null,
+      chucVu: data.chucVu || null,
+      email: data.email || null,
+      vaiTro: data.vaiTro,
+    })
+    .returning({ id: thanhVien.id });
 
-  return NextResponse.json({ success: true, id: extractInsertId(result) });
+  return NextResponse.json({ success: true, id: inserted.id });
 }

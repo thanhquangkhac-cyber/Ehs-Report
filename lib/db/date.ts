@@ -1,12 +1,10 @@
-const useSqlite = process.env.DB_DRIVER === "sqlite";
-
 /**
- * better-sqlite3 (dev-only fallback driver) cannot bind JS Date objects
- * directly - only numbers, strings, bigints, buffers, and null. mysql2
- * (production driver) accepts Date objects natively for DATETIME columns.
- * Route handlers should pass dates through this before writing so the same
- * code works against both drivers; on MySQL it is a no-op passthrough.
+ * Both drivers in use (Postgres via node-postgres with `mode: "string"`
+ * timestamp columns, and the SQLite dev fallback) store/compare timestamps
+ * as ISO strings rather than JS Date objects. Route handlers should pass
+ * dates through this before writing or comparing so values round-trip
+ * consistently across both drivers.
  */
-export function toDbDate(date: Date): Date | string {
-  return useSqlite ? date.toISOString() : date;
+export function toDbDate(date: Date): string {
+  return date.toISOString();
 }

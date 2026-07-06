@@ -4,7 +4,6 @@ import { db, schema } from "@/lib/db/client";
 import { getCurrentUser } from "@/lib/auth/session";
 import { reportSubmitSchema } from "@/lib/validation/report";
 import { computeOverdue } from "@/lib/report-status";
-import { extractInsertId } from "@/lib/db/insert-id";
 import { fireWebhook } from "@/lib/webhooks";
 
 const { baoCao } = schema;
@@ -44,18 +43,21 @@ export async function POST(req: NextRequest) {
   }
   const data = parsed.data;
 
-  const result = await db.insert(baoCao).values({
-    maNv: data.maNv,
-    hoTen: data.hoTen,
-    boPhan: data.boPhan || null,
-    xuong: data.xuong,
-    viTri: data.viTri,
-    noiDung: data.noiDung,
-    hinhAnh: data.hinhAnh || null,
-    status: "pending",
-  });
+  const [inserted] = await db
+    .insert(baoCao)
+    .values({
+      maNv: data.maNv,
+      hoTen: data.hoTen,
+      boPhan: data.boPhan || null,
+      xuong: data.xuong,
+      viTri: data.viTri,
+      noiDung: data.noiDung,
+      hinhAnh: data.hinhAnh || null,
+      status: "pending",
+    })
+    .returning({ id: baoCao.id });
 
-  const id = extractInsertId(result);
+  const id = inserted.id;
 
   await fireWebhook("baocao_moi", {
     id,

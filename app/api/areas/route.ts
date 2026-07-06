@@ -5,7 +5,6 @@ import { requireRole, handleAuthError } from "@/lib/auth/guards";
 import { getCurrentUser } from "@/lib/auth/session";
 import { areaInputSchema } from "@/lib/validation/area";
 import { generateMaQr } from "@/lib/slug";
-import { extractInsertId } from "@/lib/db/insert-id";
 
 const { qrAreas } = schema;
 
@@ -52,12 +51,15 @@ export async function POST(req: NextRequest) {
 
   const maQr = generateMaQr(data.xuong, data.khuVuc);
 
-  const result = await db.insert(qrAreas).values({
-    maQr,
-    xuong: data.xuong,
-    khuVuc: data.khuVuc,
-    phuTrach: data.phuTrach || null,
-  });
+  const [inserted] = await db
+    .insert(qrAreas)
+    .values({
+      maQr,
+      xuong: data.xuong,
+      khuVuc: data.khuVuc,
+      phuTrach: data.phuTrach || null,
+    })
+    .returning({ id: qrAreas.id });
 
-  return NextResponse.json({ success: true, id: extractInsertId(result), maQr });
+  return NextResponse.json({ success: true, id: inserted.id, maQr });
 }
