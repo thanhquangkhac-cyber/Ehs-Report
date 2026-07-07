@@ -2,6 +2,8 @@ import {
   Chart as ChartJS,
   ArcElement,
   BarElement,
+  BarController,
+  LineController,
   CategoryScale,
   LinearScale,
   LineElement,
@@ -13,6 +15,8 @@ import {
 ChartJS.register(
   ArcElement,
   BarElement,
+  BarController,
+  LineController,
   CategoryScale,
   LinearScale,
   LineElement,
