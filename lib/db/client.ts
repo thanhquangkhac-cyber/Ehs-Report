@@ -1,6 +1,6 @@
-import { drizzle as drizzlePg } from "drizzle-orm/node-postgres";
+import { drizzle as drizzlePg } from "drizzle-orm/neon-serverless";
 import { drizzle as drizzleSqlite } from "drizzle-orm/better-sqlite3";
-import { Pool } from "pg";
+import { Pool } from "@neondatabase/serverless";
 import Database from "better-sqlite3";
 import * as pgSchema from "./schema";
 import * as sqliteSchema from "./schema.sqlite";
@@ -17,7 +17,6 @@ function createPgDb() {
     globalThis.__pgPool ??
     new Pool({
       connectionString: process.env.DATABASE_URL,
-      ssl: { rejectUnauthorized: false },
     });
   if (process.env.NODE_ENV !== "production") globalThis.__pgPool = pool;
 
