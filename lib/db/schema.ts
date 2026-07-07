@@ -28,6 +28,7 @@ export const webhookEventEnum = pgEnum("webhook_event_key", [
   "phe_duyet_2",
   "da_khac_phuc",
 ]);
+export const channelPlatformEnum = pgEnum("channel_platform", ["telegram", "zalo", "slack"]);
 
 export const users = pgTable("users", {
   id: serial("id").primaryKey(),
@@ -150,3 +151,40 @@ export const webhookSettings = pgTable("webhook_settings", {
   isEnabled: smallint("is_enabled").notNull().default(1),
   updatedAt: timestamp("updated_at", { mode: "string" }).notNull().default(sql`now()`),
 });
+
+export const notificationChannels = pgTable("notification_channels", {
+  id: serial("id").primaryKey(),
+  platform: channelPlatformEnum("platform").notNull(),
+  name: varchar("name", { length: 128 }).notNull(),
+  isEnabled: smallint("is_enabled").notNull().default(1),
+
+  telegramBotToken: varchar("telegram_bot_token", { length: 255 }),
+  telegramChatId: varchar("telegram_chat_id", { length: 64 }),
+
+  zaloAccessToken: text("zalo_access_token"),
+  zaloRefreshToken: text("zalo_refresh_token"),
+  zaloAppId: varchar("zalo_app_id", { length: 64 }),
+  zaloAppSecret: varchar("zalo_app_secret", { length: 128 }),
+  zaloOaId: varchar("zalo_oa_id", { length: 64 }),
+  zaloRecipientUserId: varchar("zalo_recipient_user_id", { length: 64 }),
+  zaloTokenExpiresAt: timestamp("zalo_token_expires_at", { mode: "string" }),
+
+  slackWebhookUrl: varchar("slack_webhook_url", { length: 512 }),
+
+  createdAt: timestamp("created_at", { mode: "string" }).notNull().default(sql`now()`),
+  updatedAt: timestamp("updated_at", { mode: "string" }).notNull().default(sql`now()`),
+}, (table) => [
+  index("idx_notification_channels_platform").on(table.platform),
+]);
+
+export const notificationChannelEvents = pgTable("notification_channel_events", {
+  id: serial("id").primaryKey(),
+  channelId: integer("channel_id")
+    .notNull()
+    .references(() => notificationChannels.id, { onDelete: "cascade" }),
+  eventKey: webhookEventEnum("event_key").notNull(),
+  isEnabled: smallint("is_enabled").notNull().default(1),
+}, (table) => [
+  uniqueIndex("uq_channel_event").on(table.channelId, table.eventKey),
+  index("idx_nce_event_key").on(table.eventKey),
+]);

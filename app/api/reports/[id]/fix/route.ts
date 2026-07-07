@@ -4,6 +4,8 @@ import { db, schema } from "@/lib/db/client";
 import { getCurrentUser } from "@/lib/auth/session";
 import { reportFixSchema } from "@/lib/validation/report";
 import { fireWebhook } from "@/lib/webhooks";
+import { notify } from "@/lib/notifications/dispatch";
+import { formatDaKhacPhuc } from "@/lib/notifications/format";
 import { toDbDate } from "@/lib/db/date";
 
 const { baoCao } = schema;
@@ -92,6 +94,10 @@ export async function POST(
     fixer: data.fixer,
     hoTen: report.hoTen,
   });
+  await notify(
+    "da_khac_phuc",
+    formatDaKhacPhuc({ id: reportId, fixer: data.fixer, hoTen: report.hoTen, fixNote: data.fixNote, fixImg: data.fixImg })
+  );
 
   return NextResponse.json({ success: true });
 }

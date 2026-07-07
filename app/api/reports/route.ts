@@ -5,6 +5,8 @@ import { getCurrentUser } from "@/lib/auth/session";
 import { reportSubmitSchema } from "@/lib/validation/report";
 import { computeOverdue } from "@/lib/report-status";
 import { fireWebhook } from "@/lib/webhooks";
+import { notify } from "@/lib/notifications/dispatch";
+import { formatBaocaoMoi } from "@/lib/notifications/format";
 
 const { baoCao } = schema;
 
@@ -65,6 +67,10 @@ export async function POST(req: NextRequest) {
     xuong: data.xuong,
     viTri: data.viTri,
   });
+  await notify(
+    "baocao_moi",
+    formatBaocaoMoi({ id, hoTen: data.hoTen, xuong: data.xuong, viTri: data.viTri, noiDung: data.noiDung })
+  );
 
   return NextResponse.json({ success: true, id });
 }

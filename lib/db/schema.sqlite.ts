@@ -147,3 +147,42 @@ export const webhookSettings = sqliteTable("webhook_settings", {
   isEnabled: integer("is_enabled").notNull().default(1),
   updatedAt: text("updated_at").notNull().default(sql`CURRENT_TIMESTAMP`),
 });
+
+export const notificationChannels = sqliteTable("notification_channels", {
+  id: integer("id").primaryKey({ autoIncrement: true }),
+  platform: text("platform", { enum: ["telegram", "zalo", "slack"] }).notNull(),
+  name: text("name").notNull(),
+  isEnabled: integer("is_enabled").notNull().default(1),
+
+  telegramBotToken: text("telegram_bot_token"),
+  telegramChatId: text("telegram_chat_id"),
+
+  zaloAccessToken: text("zalo_access_token"),
+  zaloRefreshToken: text("zalo_refresh_token"),
+  zaloAppId: text("zalo_app_id"),
+  zaloAppSecret: text("zalo_app_secret"),
+  zaloOaId: text("zalo_oa_id"),
+  zaloRecipientUserId: text("zalo_recipient_user_id"),
+  zaloTokenExpiresAt: text("zalo_token_expires_at"),
+
+  slackWebhookUrl: text("slack_webhook_url"),
+
+  createdAt: text("created_at").notNull().default(sql`CURRENT_TIMESTAMP`),
+  updatedAt: text("updated_at").notNull().default(sql`CURRENT_TIMESTAMP`),
+}, (table) => [
+  index("idx_notification_channels_platform").on(table.platform),
+]);
+
+export const notificationChannelEvents = sqliteTable("notification_channel_events", {
+  id: integer("id").primaryKey({ autoIncrement: true }),
+  channelId: integer("channel_id")
+    .notNull()
+    .references(() => notificationChannels.id, { onDelete: "cascade" }),
+  eventKey: text("event_key", {
+    enum: ["baocao_moi", "phe_duyet", "phe_duyet_2", "da_khac_phuc"],
+  }).notNull(),
+  isEnabled: integer("is_enabled").notNull().default(1),
+}, (table) => [
+  uniqueIndex("uq_channel_event").on(table.channelId, table.eventKey),
+  index("idx_nce_event_key").on(table.eventKey),
+]);

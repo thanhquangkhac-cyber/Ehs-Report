@@ -6,6 +6,8 @@ import { reportApproveSchema } from "@/lib/validation/report";
 import { computeDeadline } from "@/lib/report-status";
 import { generateFixToken, computeFixTokenExpiry } from "@/lib/fix-token";
 import { fireWebhook } from "@/lib/webhooks";
+import { notify } from "@/lib/notifications/dispatch";
+import { formatPheDuyet, formatPheDuyet2 } from "@/lib/notifications/format";
 import { toDbDate } from "@/lib/db/date";
 
 const { baoCao } = schema;
@@ -93,6 +95,17 @@ export async function POST(
     hoTen: report.hoTen,
     maNv: report.maNv,
   });
+  await notify(
+    "phe_duyet",
+    formatPheDuyet({
+      id: reportId,
+      nguoiKp: data.nguoiKp,
+      nkpEmail: data.nkpEmail,
+      deadline: deadline.toISOString(),
+      fixLink,
+    })
+  );
+  await notify("phe_duyet_2", formatPheDuyet2({ id: reportId, hoTen: report.hoTen, maNv: report.maNv }));
 
   return NextResponse.json({ success: true, fixLink });
 }
